@@ -55,7 +55,7 @@ def train_loop(H, data_train, data_valid, preprocess_fn, vae, ema_vae, logprint)
     early_evals = set([1] + [2 ** exp for exp in range(3, 14)])
     stats = []
     iters_since_starting = 0
-    H.ema_rate = torch.as_tensor(H.ema_rate).cuda()
+    H.ema_rate = torch.as_tensor(H.ema_rate)
     for epoch in range(starting_epoch, H.num_epochs):
         train_sampler.set_epoch(epoch)
         for x in DataLoader(data_train, batch_size=H.n_batch, drop_last=True, pin_memory=True, sampler=train_sampler):

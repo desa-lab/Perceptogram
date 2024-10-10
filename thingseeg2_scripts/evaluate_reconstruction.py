@@ -21,7 +21,7 @@ from skimage.transform import resize as imresize
 from skimage.metrics import structural_similarity as ssim
 import scipy as sp
 
-
+mps = torch.device('mps')
 
 import argparse
 parser = argparse.ArgumentParser(description='Argument Parser')
@@ -140,7 +140,7 @@ for (net_name,layer) in net_list:
             net.classifier[5].register_forward_hook(fn)
             
     elif net_name == 'clip':
-        model, _ = clip.load("ViT-L/14", device='cuda:{}'.format(device))
+        model, _ = clip.load("ViT-L/14", device='mps')
         net = model.visual
         net = net.to(torch.float32)
         if layer==7:
@@ -158,12 +158,12 @@ for (net_name,layer) in net_list:
         net = torch.hub.load('facebookresearch/swav:main', 'resnet50')
         net.avgpool.register_forward_hook(fn) 
     net.eval()
-    net.cuda(device)    
+    net.to(mps)
     
     with torch.no_grad():
         for i,x in enumerate(loader):
             print(i*batchsize)
-            x = x.cuda(device)
+            x = x.to(mps)
             _ = net(x)
     if net_name == 'clip':
         if layer == 7 or layer == 12:

@@ -20,6 +20,8 @@ from vae import VAE
 from torch.nn.parallel.distributed import DistributedDataParallel
 from train_helpers import restore_params
 
+mps = torch.device('mps')
+
 def set_up_hyperparams(s=None):
     H = Hyperparams()
     parser = argparse.ArgumentParser()
@@ -32,7 +34,7 @@ def set_up_hyperparams(s=None):
         logprint(type='hparam', key=k, value=H[k])
     np.random.seed(H.seed)
     torch.manual_seed(H.seed)
-    torch.cuda.manual_seed(H.seed)
+    torch.mps.manual_seed(H.seed)
     logprint('training model', H.desc, 'on', H.dataset)
     return H, logprint
 
@@ -52,11 +54,10 @@ def set_up_data(H):
     #else:
     #    eval_dataset = vaX
 
-    shift = torch.tensor([shift]).cuda().view(1, 1, 1, 1)
-    scale = torch.tensor([scale]).cuda().view(1, 1, 1, 1)
-    shift_loss = torch.tensor([shift_loss]).cuda().view(1, 1, 1, 1)
-    scale_loss = torch.tensor([scale_loss]).cuda().view(1, 1, 1, 1)
-    
+    shift = torch.tensor([shift], device=mps).view(1, 1, 1, 1)
+    scale = torch.tensor([scale], device=mps).view(1, 1, 1, 1)
+    shift_loss = torch.tensor([shift_loss], device=mps).view(1, 1, 1, 1)
+    scale_loss = torch.tensor([scale_loss], device=mps).view(1, 1, 1, 1)    
     #train_data = TensorDataset(torch.as_tensor(trX))
     #valid_data = TensorDataset(torch.as_tensor(eval_dataset))
     #untranspose = False
@@ -71,7 +72,7 @@ def set_up_data(H):
         #untranspose = False
         #if untranspose:
         #    x[0] = x[0].permute(0, 2, 3, 1)
-        inp = x.cuda(non_blocking=True).float()
+        inp = x.float()
         out = inp.clone()
         inp.add_(shift).mul_(scale)
         out.add_(shift_loss).mul_(scale_loss)
@@ -88,7 +89,7 @@ def load_vaes(H, logprint=None):
     else:
         ema_vae.load_state_dict(vae.state_dict())
     ema_vae.requires_grad_(False)
-    ema_vae = ema_vae.cuda(H.local_rank)
+    # ema_vae = ema_vae.cuda(H.local_rank)
 
     #vae = DistributedDataParallel(vae, device_ids=[H.local_rank], output_device=H.local_rank)
 

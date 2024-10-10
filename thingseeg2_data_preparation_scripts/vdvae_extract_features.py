@@ -25,6 +25,8 @@ from PIL import Image
 import torchvision.transforms as T
 from tqdm import tqdm
 
+mps = torch.device('mps')
+
 import argparse
 parser = argparse.ArgumentParser(description='Argument Parser')
 # parser.add_argument("-sub", "--sub",help="Subject Number",default=1)
@@ -48,6 +50,7 @@ H, preprocess_fn = set_up_data(H)
 
 print('Models is Loading')
 ema_vae = load_vaes(H)
+ema_vae.to(mps)
   
 class batch_generator_external_images(Dataset):
 
@@ -59,7 +62,7 @@ class batch_generator_external_images(Dataset):
     def __getitem__(self,idx):
         img = Image.fromarray(self.im[idx])
         img = T.functional.resize(img,(64,64))
-        img = torch.tensor(np.array(img)).float()
+        img = torch.tensor(np.array(img), device=mps).float()
         #img = img/255
         #img = img*2 - 1
         return img
@@ -78,7 +81,7 @@ trainloader = DataLoader(train_images,batch_size,shuffle=False)
 testloader = DataLoader(test_images,batch_size,shuffle=False)
 num_latents = 31
 test_latents = []
-torch.cuda.manual_seed(0)
+torch.mps.manual_seed(0)
 torch.manual_seed(0)
 for i,x in tqdm(enumerate(testloader), total=len(testloader), desc='Extracting test VDVAE latents'):
   data_input, target = preprocess_fn(x)

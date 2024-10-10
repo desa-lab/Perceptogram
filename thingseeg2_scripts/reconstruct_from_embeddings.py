@@ -142,7 +142,9 @@ class batch_generator_external_images(Dataset):
 
 pred_latents = pred_autokl.copy()
 
-data_input, target = preprocess_fn(torch.zeros(1, 64, 64, 3))
+mps = torch.device('mps')
+data_input, target = preprocess_fn(torch.zeros(1, 64, 64, 3).to(mps))
+ema_vae = ema_vae.to(mps)
 with torch.no_grad():
     activations = ema_vae.encoder.forward(data_input)
     px_z, stats = ema_vae.decoder.forward(activations, get_latents=True)
@@ -169,13 +171,13 @@ def sample_from_hier_latents(latents,sample_ids):
   layers_num=len(latents)
   sample_latents = []
   for i in range(layers_num):
-    sample_latents.append(torch.tensor(latents[i][sample_ids]).float().cuda())
+    sample_latents.append(torch.tensor(latents[i][sample_ids]).float().to(mps))
   return sample_latents
 
 #samples = []
 
 torch.manual_seed(seed)
-torch.cuda.manual_seed(seed)
+torch.mps.manual_seed(seed)
 
 for i in range(int(np.ceil(200/batch_size))):
   print(i*batch_size)
@@ -262,8 +264,8 @@ net.load_state_dict(sd, strict=False)
 
 
 # Might require editing the GPU assignments due to Memory issues
-net.clip.cuda(gpu1)
-net.autokl.cuda(gpu1)
+net.clip.to(mps)
+net.autokl.to(mps)
 
 #net.model.cuda(1)
 sampler = sampler(net)
@@ -273,10 +275,10 @@ batch_size = 1
 
 # save_dir = 'cache/thingseeg2_synthetic/predicted_embeddings/'
 # pred_cliptext = np.load(save_dir + 'thingseeg2_regress_cliptext_not_much_real__cat_real__20_40_800ms.npy')
-pred_cliptext = torch.tensor(pred_cliptext).half().cuda(gpu2)
+pred_cliptext = torch.tensor(pred_cliptext).half().to(mps)
 
 # pred_clipvision = np.load(save_dir + 'thingseeg2_regress_clipvision_not_much_real__cat_real__20_40_800ms.npy')
-pred_clipvision = torch.tensor(pred_clipvision).half().cuda(gpu2)
+pred_clipvision = torch.tensor(pred_clipvision).half().to(mps)
 
 
 n_samples = 1
@@ -288,7 +290,7 @@ ctype = 'prompt'
 net.autokl.half()
 
 torch.manual_seed(seed)
-torch.cuda.manual_seed(seed)
+torch.mps.manual_seed(seed)
 for im_id in range(len(pred_cliptext)):
 
     zim = Image.open(vdvae_recon_dir + '{}.png'.format(im_id))
@@ -297,7 +299,7 @@ for im_id in range(len(pred_cliptext)):
    
     zim = regularize_image(zim)
     zin = zim*2 - 1
-    zin = zin.unsqueeze(0).cuda(gpu1).half()
+    zin = zin.unsqueeze(0).to(mps).half()
 
     init_latent = net.autokl_encode(zin)
     
@@ -305,19 +307,19 @@ for im_id in range(len(pred_cliptext)):
     #strength=0.75
     assert 0. <= strength <= 1., 'can only work with strength in [0.0, 1.0]'
     t_enc = int(strength * ddim_steps)
-    device = 'cuda:' + str(gpu1)
-    z_enc = sampler.stochastic_encode(init_latent, torch.tensor([t_enc]).to(device))
+    # device = 'cuda:' + str(gpu1)
+    z_enc = sampler.stochastic_encode(init_latent, torch.tensor([t_enc]).to(mps))
     #z_enc,_ = sampler.encode(init_latent.cuda(1).half(), c.cuda(1).half(), torch.tensor([t_enc]).to(sampler.model.model.diffusion_model.device))
 
     dummy = ''
     utx = net.clip_encode_text(dummy)
-    utx = utx.cuda(gpu2).half()
+    utx = utx.to(mps).half()
     
-    dummy = torch.zeros((1,3,224,224)).cuda(gpu1)
+    dummy = torch.zeros((1,3,224,224)).to(mps)
     uim = net.clip_encode_vision(dummy)
-    uim = uim.cuda(gpu2).half()
+    uim = uim.to(mps).half()
     
-    z_enc = z_enc.cuda(gpu2)
+    z_enc = z_enc.to(mps)
 
     h, w = 512,512
     shape = [n_samples, 4, h//8, w//8]
@@ -328,8 +330,8 @@ for im_id in range(len(pred_cliptext)):
     #c[:,0] = u[:,0]
     #z_enc = z_enc.cuda(1).half()
     
-    sampler.model.model.diffusion_model.device='cuda:' + str(gpu2)
-    sampler.model.model.diffusion_model.half().cuda(gpu2)
+    sampler.model.model.diffusion_model.device='mps'
+    sampler.model.model.diffusion_model.half().to(mps)
     #mixing = 0.4
     first_conditioning=[uim, cim]
     second_conditioning=[utx, ctx]
@@ -351,7 +353,7 @@ for im_id in range(len(pred_cliptext)):
         second_ctype='prompt',
         mixed_ratio=(1-mixing), )
     
-    z = z.cuda(gpu1).half()
+    z = z.to(mps).half()
     x = net.autokl_decode(z)
     color_adj='None'
     #color_adj_to = cin[0]

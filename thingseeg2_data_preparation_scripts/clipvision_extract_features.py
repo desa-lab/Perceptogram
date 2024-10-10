@@ -31,7 +31,7 @@ net = get_model()(cfgm)
 sd = torch.load(pth, map_location='cpu')
 net.load_state_dict(sd, strict=False)    
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device('mps')
 net.clip = net.clip.to(device)
 
 class batch_generator_external_images(Dataset):
