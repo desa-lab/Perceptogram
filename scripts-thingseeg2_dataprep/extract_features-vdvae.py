@@ -111,6 +111,6 @@ train_latents = np.concatenate(train_latents)
 
 if not os.path.exists('cache/thingseeg2_extracted_embeddings'):
     os.makedirs('cache/thingseeg2_extracted_embeddings')
-np.save('cache/thingseeg2_extracted_embeddings/train_autokl.npy', train_latents)
-np.save('cache/thingseeg2_extracted_embeddings/test_autokl.npy', test_latents)
+np.save('cache/thingseeg2_extracted_embeddings/train_vdvae.npy', train_latents)
+np.save('cache/thingseeg2_extracted_embeddings/test_vdvae.npy', test_latents)
 

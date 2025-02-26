@@ -2,5 +2,5 @@
 *
 # Except this file
 !.gitignore
-!diffusion_recon_plot_ordered_by_performance.png
+!versatile_diffusion_ordered_by_performance.png
 !umap_CLIP.png

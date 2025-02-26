@@ -55,8 +55,8 @@ cliptext_filename = f'regress_cliptext{param}.npy'
 
 ids = list(range(len(eeg_train)))
 # VDVAE Regression
-train_latents= np.load('cache/thingseeg2_extracted_embeddings/train_autokl.npy', mmap_mode='r')[ids]
-test_latents = np.load('cache/thingseeg2_extracted_embeddings/test_autokl.npy', mmap_mode='r')
+train_latents= np.load('cache/thingseeg2_extracted_embeddings/train_vdvae.npy', mmap_mode='r')[ids]
+test_latents = np.load('cache/thingseeg2_extracted_embeddings/test_vdvae.npy', mmap_mode='r')
 print(train_latents.shape, test_latents.shape)
 
 print("Training VDVAE Regression")

@@ -157,9 +157,9 @@ for row in range(10):
 plt.subplots_adjust(wspace=0.02, hspace=0.02)
 
 if ordered_by_performance:
-    plt.savefig(recon_dir+f'diffusion_recon_plot_ordered_by_performance{param}.png',bbox_inches='tight')
+    plt.savefig(recon_dir+f'versatile_diffusion_ordered_by_performance{param}.png',bbox_inches='tight')
 else:
-    plt.savefig(recon_dir+f'diffusion_recon_plot{param}.png',bbox_inches='tight')
+    plt.savefig(recon_dir+f'versatile_diffusion{param}.png',bbox_inches='tight')
 
 # Load reconstructed images
 reconstructed_images = [load_vdvae_image(image_id) for image_id in image_ids]
@@ -186,6 +186,6 @@ for row in range(10):
 plt.subplots_adjust(wspace=0.02, hspace=0.02)
 
 if ordered_by_performance:
-    plt.savefig(recon_dir+f'vdvae_recon_plot_ordered_by_performance{param}.png',bbox_inches='tight')
+    plt.savefig(recon_dir+f'vdvae_ordered_by_performance{param}.png',bbox_inches='tight')
 else:
-    plt.savefig(recon_dir+f'vdvae_recon_plot{param}.png',bbox_inches='tight')
+    plt.savefig(recon_dir+f'vdvae_{param}.png',bbox_inches='tight')
