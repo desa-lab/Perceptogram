@@ -1,23 +1,25 @@
 # Perceptogram
 Link to paper: [Perceptogram: Reconstructing Visual Percepts from EEG](https://arxiv.org/abs/2404.01250)
 
-## Setup
+## unCLIP Pipeline:
 
-### Versatile Diffusion Pipeline:
+### Setup
 
 1. Create the python environment
 
 + For mac and linux:
 ```
-virtualenv pyenv-vd --python=3.10.12
-source pyenv-vd/bin/activate
-pip install -r requirements-vd.txt
+virtualenv pyenv --python=3.10.12
+source pyenv/bin/activate
+pip install -r requirements.txt
+mv scripts-thingseeg2_dataprep/pipeline_stable_unclip_img2img_modified.py pyenv/lib/python3.10/site-packages/diffusers/pipelines/stable_diffusion/pipeline_stable_unclip_img2img.py
 ```
 + For Windows:
 ```
-virtualenv pyenv-vd --python=3.10.12
+virtualenv pyenv --python=3.10.12
 pyenv-vd\Scripts\activate
-pip install -r requirements-vd.txt
+pip install -r requirements.txt
+move scripts-thingseeg2_dataprep\pipeline_stable_unclip_img2img_modified.py pyenv\Lib\site-packages\diffusers\pipelines\stable_diffusion\pipeline_stable_unclip_img2img.py
 ```
 
 2. Download [preprocessed eeg data](https://osf.io/anp5v/), unzip "sub01", "sub02", etc under data/thingseeg2_preproc.
@@ -84,6 +86,45 @@ python scripts-thingseeg2_dataprep/save_thingseeg2_images.py
 python scripts-thingseeg2_dataprep/save_thingseeg2_concepts.py
 ```
 
+5. Extract train and test latent embeddings from images
+```
+python scripts-thingseeg2_dataprep/extract_features-clip.py
+python scripts-thingseeg2_dataprep/extract_features-vae.py
+python scripts-thingseeg2_dataprep/evaluation_extract_features_from_test_images.py
+```
+
+### Training and reconstruction
+```
+python scripts-thingseeg2/train_regression_clip.py 
+python scripts-thingseeg2/train_regression_vae.py
+python scripts-thingseeg2/reconstruct_from_embeddings.py 
+python scripts-thingseeg2/evaluate_reconstruction.py 
+python scripts-thingseeg2/plot_reconstructions.py -ordered True
+```
+
+## Versatile Diffusion Pipeline:
+
+### Setup
+
+1. Create the python environment
+
++ For mac and linux:
+```
+virtualenv pyenv-vd --python=3.10.12
+source pyenv-vd/bin/activate
+pip install -r requirements-vd.txt
+```
++ For Windows:
+```
+virtualenv pyenv-vd --python=3.10.12
+pyenv-vd\Scripts\activate
+pip install -r requirements-vd.txt
+```
+
+2. Same as unCLIP Pipeline Setup step 2.
+
+3. Same as unCLIP Pipeline Setup step 3.
+
 4. Download VDVAE and Versatile Diffusion weights
 + For mac and linux:
 ```
@@ -120,15 +161,15 @@ python scripts-thingseeg2_dataprep/extract_features-cliptext.py
 python scripts-thingseeg2_dataprep/evaluation_extract_features_from_test_images.py 
 ```
 
-## Training and reconstruction
+### Training and reconstruction
 ```
 python scripts-thingseeg2/train_regression.py 
-python scripts-thingseeg2/reconstruct_from_embeddings.py 
+python scripts-thingseeg2/reconstruct_from_embeddings_vd.py 
 python scripts-thingseeg2/evaluate_reconstruction.py 
 python scripts-thingseeg2/plot_reconstructions.py -ordered True
 ```
 
-## Reproducing figures
+### Reproducing figures
 The reconstruction script assumes you have 7 GPUs, remove parallelism and set all GPUs to 0 if you only have 1 GPU.\
 
 1. Reproducing `results/thingseeg2_preproc/fig_performance.png`:
