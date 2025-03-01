@@ -1,8 +1,10 @@
 albumentations==0.4.3
 opencv-python==4.10.0.84
 pudb==2019.2
+h5py==3.13.0
 imageio==2.9.0
 imageio-ffmpeg==0.4.2
+nibabel==5.3.2
 pytorch-lightning==1.4.2
 torchmetrics==0.6
 omegaconf==2.1.1
@@ -19,6 +21,7 @@ streamlit-drawable-canvas==0.8.0
 wandb==0.19.1
 # -e ./stablediffusion
 diffusers==0.32.2
+openai-clip==1.0.1
 scikit-learn==1.6.1
 --extra-index-url https://download.pytorch.org/whl/cu121
 torch==2.4.0

@@ -1,7 +1,7 @@
 # Perceptogram
 Link to paper: [Perceptogram: Reconstructing Visual Percepts from EEG](https://arxiv.org/abs/2404.01250)
 
-## unCLIP Pipeline:
+## THINGS-EEG2 — unCLIP Pipeline:
 
 ### Setup
 
@@ -102,7 +102,7 @@ python scripts-thingseeg2/evaluate_reconstruction.py
 python scripts-thingseeg2/plot_reconstructions.py -ordered True
 ```
 
-## Versatile Diffusion Pipeline:
+## THINGS-EEG2 — Versatile Diffusion Pipeline:
 
 ### Setup
 
@@ -203,7 +203,40 @@ scripts-thingseeg2_figures/evaluate_across_size_num_avg.sh
 python scripts-thingseeg2_figures/fig_across_size_num_avg.py
 ```
 
-# Acknowledgement
+# NSD — unCLIP Pipeline:
+
+### Setup
+
+1. Create the python environment, same as THINGS-EEG2 unCLIP Pipeline Setup step 1.
+
+2. Download the preprocessed fMRI data 
+
+```
+python scripts-nsd_dataprep/download_nsd_data.py
+cd data/nsd_metadata/
+wget https://huggingface.co/datasets/pscotti/naturalscenesdataset/resolve/main/COCO_73k_annots_curated.npy
+cd ../../
+for sub in 1 2 5 7; do python scripts-nsd_dataprep/prepare_nsd_data.py -sub $sub; done
+python scripts-nsd_dataprep/save_test_images.py
+```
+
+3. Extract train and test latent embeddings from images
+
+```
+python scripts-nsd_dataprep/extract_features-clip.py
+python scripts-nsd_dataprep/extract_features-vae.py
+python scripts-nsd_dataprep/evaluation_extract_features_from_test_images.py
+```
+
+### Training and reconstruction
+```
+python scripts-nsd/train_regression_clip.py 
+python scripts-nsd/train_regression_vae.py
+python scripts-nsd/reconstruct_from_embeddings.py 
+python scripts-nsd/evaluate_reconstruction.py 
+```
+
+## Acknowledgement
 Ozcelik, F., & VanRullen, R. (2023). Natural scene reconstruction from fMRI signals using generative latent diffusion. Scientific Reports, 13(1), 15666. https://doi.org/10.1038/s41598-023-42891-8
 
 Gifford, A. T., Dwivedi, K., Roig, G., & Cichy, R. M. (2022). A large and rich EEG dataset for modeling human visual object recognition. NeuroImage, 264, 119754. https://doi.org/10.1016/j.neuroimage.2022.119754

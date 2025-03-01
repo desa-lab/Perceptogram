@@ -1,0 +1,9 @@
+# Ignore everything in this directory
+*
+# Except this file
+!.gitignore
+!thingseeg2_preproc/sub-01/
+!thingseeg2_preproc/fig_performance.png
+!thingseeg2_preproc/fig_ablations.png
+!thingseeg2_preproc/fig_across_duration.png
+!thingseeg2_preproc/fig_CLIP_across_size_num_avg.png
