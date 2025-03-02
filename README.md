@@ -203,7 +203,7 @@ scripts-thingseeg2_figures/evaluate_across_size_num_avg.sh
 python scripts-thingseeg2_figures/fig_across_size_num_avg.py
 ```
 
-# NSD — unCLIP Pipeline:
+## NSD — unCLIP Pipeline:
 
 ### Setup
 
@@ -234,6 +234,28 @@ python scripts-nsd/train_regression_clip.py
 python scripts-nsd/train_regression_vae.py
 python scripts-nsd/reconstruct_from_embeddings.py 
 python scripts-nsd/evaluate_reconstruction.py 
+```
+
+### Reproducing figures
+1. Install FreeSurfer
+2. Reset PyCortex database location
++ For mac and linux:
+```
+rm ~/.config/pycortex/options.cfg
+mv scripts-nsd_dataprep/defaults.cfg pyenv/lib/python3.10/site-packages/cortex/defaults.cfg
+```
+3. Plot patterns in subject-native space
+```
+for sub in 1 2 5 7; do python scripts-nsd/train_regression_clip.py  -sub $sub; done
+for sub in 1 2 5 7; do python scripts-nsd/train_regression-encode_clip.py  -sub $sub; done
+for sub in 1 2 5 7; do python scripts-nsd_figures/freesurfer_import_subj.py -sub $sub; done
+for sub in 1 2 5 7; do python scripts-nsd_figures/make_clip_patterns_func1pt8mm.py -sub $sub; done
+```
+4. Plot patterns in MNI space
+```
+for sub in 1 2 5 7; do python scripts-nsd_figures/to_mni.py -sub $sub; done
+for sub in 1 2 5 7; do python scripts-nsd_figures/plot_clip_patterns_mni.py -sub $sub; done
+python scripts-nsd_figures/plot_clip_patterns_mni_avg.py
 ```
 
 ## Acknowledgement

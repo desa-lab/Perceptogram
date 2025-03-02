@@ -7,3 +7,8 @@
 !thingseeg2_preproc/fig_ablations.png
 !thingseeg2_preproc/fig_across_duration.png
 !thingseeg2_preproc/fig_CLIP_across_size_num_avg.png
+!nsd_preproc/
+!nsd_preproc/avg-1-2-5-7/
+!nsd_preproc/avg-1-2-5-7/clip_patterns/
+!nsd_preproc/avg-1-2-5-7/clip_patterns/mni/
+!nsd_preproc/avg-1-2-5-7/clip_patterns/mni/*
