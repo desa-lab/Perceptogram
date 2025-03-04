@@ -1,7 +1,5 @@
 import numpy as np
-import scipy
 from scipy.spatial.distance import correlation
-import random
 import sklearn.linear_model as skl
 import os
 import pickle
@@ -18,12 +16,13 @@ parser.add_argument('-mirrored2', '--mirrored2', help='Mirrored electrode locati
 parser.add_argument('-half', '--half', help='Half of the channels using the 10-20 instead of 10-10 montage', default=False, action=argparse.BooleanOptionalAction)
 parser.add_argument('-dsi1', '--dsi1', help='Simulate DSI-24 layout, using P7 and P8', default=False, action=argparse.BooleanOptionalAction)
 parser.add_argument('-dsi2', '--dsi2', help='Simulate DSI-24 layout, not using P7 and P8', default=False, action=argparse.BooleanOptionalAction)
-parser.add_argument('-alpha', '--alpha', help='Alpha for regression strength', default=0)
+parser.add_argument('-alpha', '--alpha', help='Alpha for regression strength', default=1000)
 parser.add_argument('-param', '--param', help='Custom Parameter', default='')
 
 args = parser.parse_args()
 sub=int(args.sub)
 saving_weights=args.saving_weights
+alpha = int(args.alpha)
 train_size=int(args.size)
 average=args.average
 duration=int(args.duration)
@@ -32,7 +31,6 @@ mirrored2=args.mirrored2
 half=args.half
 dsi1=args.dsi1
 dsi2=args.dsi2
-alpha = int(args.alpha)
 if average != '' or train_size != 16540 or duration != 80:
     param = f'_{train_size}avg{average}_dur{duration}'
 else:
@@ -78,28 +76,31 @@ norm_scale_train = np.std(eeg_train, axis=0, ddof=1)
 eeg_train = (eeg_train - norm_mean_train) / norm_scale_train
 eeg_test = (eeg_test - norm_mean_train) / norm_scale_train
 
+
 # Save Directory
 weights_save_dir = f'cache/thingseeg2_preproc/regression_weights/sub-{sub:02d}/'
 if not os.path.exists(weights_save_dir):
     os.makedirs(weights_save_dir)
-vdvae_weights_filename = f'regress_clip_weights{param}.pkl'
+weights_filename = f'regress-encode_ica1k_weights{param}.pkl'
 save_dir = f'cache/thingseeg2_preproc/predicted_embeddings/sub-{sub:02d}/'
 if not os.path.exists(save_dir):
     os.makedirs(save_dir)
-latent_filename = f'regress_clip{param}.npy'
-# latent_filename = f'regress_clip{param}_grayscale.npy'
+pred_filename = f'regress-encode_ica1k{param}.npy'
 
 ids = list(range(len(eeg_train)))
 # Regression
-train_latents= np.load('cache/thingseeg2_extracted_embeddings/train_clip.npy', mmap_mode='r')[ids]
-test_latents = np.load('cache/thingseeg2_extracted_embeddings/test_clip.npy', mmap_mode='r')
-# train_latents= np.load('cache/thingseeg2_extracted_embeddings/train_clip_grayscale.npy', mmap_mode='r')[ids]
-# test_latents = np.load('cache/thingseeg2_extracted_embeddings/test_clip_grayscale.npy', mmap_mode='r')
+train_latents= np.load('cache/thingseeg2_extracted_embeddings/train_ica1k.npy', mmap_mode='r')[ids]
+test_latents = np.load('cache/thingseeg2_extracted_embeddings/test_ica1k.npy', mmap_mode='r')
 print(train_latents.shape, test_latents.shape)
+
+train_latents_mean = np.mean(train_latents,axis=0)
+train_latents_std = np.std(train_latents,axis=0)
+train_latents = (train_latents - train_latents_mean) / train_latents_std
+test_latents = (test_latents - train_latents_mean) / train_latents_std
 
 print("Training Regression")
 reg = skl.Ridge(alpha=alpha, max_iter=50000, fit_intercept=True)
-reg.fit(eeg_train, train_latents)
+reg.fit(train_latents, eeg_train)
 print('Training complete')
 
 if saving_weights:
@@ -108,25 +109,21 @@ if saving_weights:
         'bias' : reg.intercept_,
     }
 
-    with open(weights_save_dir + vdvae_weights_filename, "wb") as f:
+    with open(weights_save_dir + weights_filename, "wb") as f:
         pickle.dump(datadict,f)
 
-pred_latent = reg.predict(eeg_test)
-pred_latent_mean = np.mean(pred_latent,axis=0)
-pred_latent_std = np.std(pred_latent,axis=0)
-std_norm_pred_latent = (pred_latent - pred_latent_mean) / pred_latent_std
-train_latents_mean = np.mean(train_latents,axis=0)
-train_latents_std = np.std(train_latents,axis=0)
-pred_latents = std_norm_pred_latent * train_latents_std + train_latents_mean
+pred_eeg = reg.predict(test_latents)
 
-np.save(save_dir + latent_filename, pred_latents)
+np.save(save_dir + pred_filename, pred_eeg)
 
 # Compute the Euclidean distances
-euclidean_distances = np.array([np.linalg.norm(u - v) for u, v in zip(pred_latents, test_latents)])
-correlation_distances = np.array([correlation(u, v) for u, v in zip(pred_latents, test_latents)])
+euclidean_distances = np.array([np.linalg.norm(u - v) for u, v in zip(pred_eeg, eeg_test)])
+correlation_distances = np.array([correlation(u, v) for u, v in zip(pred_eeg, eeg_test)])
 # Compute the average Euclidean distance
 average_euclidean_distance = euclidean_distances.mean()
 correlations = (1 - correlation_distances).mean()
-print(reg.score(eeg_test,test_latents), average_euclidean_distance, correlations) # 0.034224083998682577 21.1938984051386 0.5412925614798246 when alpha=1000
+print(reg.score(test_latents, eeg_test), average_euclidean_distance, correlations)
 
-
+# -1.1317343127577941 13.595983878502054 0.05468043790343973 for alpha=1000
+# -0.18452059931953008 10.945475819825806 0.058097234242863734 for alpha=1000000
+# -0.1851138319175139 10.95175589859752 0.05819316762828041 when alpha=10000000

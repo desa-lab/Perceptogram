@@ -11,9 +11,11 @@ parser = argparse.ArgumentParser(description='Argument Parser')
 parser.add_argument("-sub", "--sub",help="Subject Number",default=1)
 parser.add_argument('-weights', '--saving_weights',help="Saving the weights", default=True, action=argparse.BooleanOptionalAction)
 parser.add_argument('-size', '--size', help='Size', default=8859)
+parser.add_argument('-alpha', '--alpha', help='Alpha for regression strength', default=10000)
 args = parser.parse_args()
 sub = int(args.sub)
 saving_weights=args.saving_weights
+alpha=int(args.alpha)
 param = ''
 
 # Load fMRI data
@@ -47,7 +49,7 @@ train_latents = (train_latents - train_latents_mean) / train_latents_std
 test_latents = (test_latents - train_latents_mean) / train_latents_std
 
 print("Training Regression")
-reg = skl.Ridge(alpha=10000, max_iter=50000, fit_intercept=True) # alpha=50000
+reg = skl.Ridge(alpha=alpha, max_iter=50000, fit_intercept=True) # alpha=50000
 reg.fit(train_latents, fmri_train)
 print('Training complete')
 
