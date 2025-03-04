@@ -11,6 +11,8 @@ Link to paper: [Perceptogram: Reconstructing Visual Percepts from EEG](https://a
 
 ## THINGS-EEG2 — unCLIP Pipeline:
 
+![unclip_pipeline](figures/unclip_pipeline.png)
+
 ### Setup
 
 1. Create the python environment
