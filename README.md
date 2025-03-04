@@ -3,7 +3,7 @@ Link to paper: [Perceptogram: Reconstructing Visual Percepts from EEG](https://a
 
 + Overview:
 
-<img src="figures/overview.png" width="350">
+<img src="figures/overview.png" width="400">
 
 + EEG patterns show spatial alignment with fMRI patterns:
 
