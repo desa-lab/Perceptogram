@@ -19,18 +19,17 @@ from skimage import data, img_as_float
 from skimage.transform import resize as imresize
 from skimage.metrics import structural_similarity as ssim
 import scipy as sp
+import argparse
 
-# import argparse
-# parser = argparse.ArgumentParser(description='Argument Parser')
-# parser.add_argument("-sub", "--sub",help="Subject Number",default=1)
-# args = parser.parse_args()
-# sub=int(args.sub)
-# assert sub in [0,1,2,5,7]
-
+parser = argparse.ArgumentParser(description='Argument Parser')
+parser.add_argument("-sub", "--sub",help="Subject Number",default=1)
+args = parser.parse_args()
+sub=int(args.sub)
 
 
-images_dir = 'results/thingseeg2_preproc/sub-01/versatile_diffusion'
-feats_dir = 'cache/thingseeg2_preproc/eval_features/sub-01/versatile_diffusion/'
+images_dir = f'data/nsd_metadata/test_images_direct'
+feats_dir = f'cache/nsd_test_images_eval_features'
+
 
 
 if not os.path.exists(feats_dir):

@@ -27,10 +27,10 @@ from tqdm import tqdm
 
 import argparse
 parser = argparse.ArgumentParser(description='Argument Parser')
-# parser.add_argument("-sub", "--sub",help="Subject Number",default=1)
+parser.add_argument("-sub", "--sub",help="Subject Number",default=1)
 parser.add_argument("-bs", "--bs",help="Batch Size",default=30)
 args = parser.parse_args()
-# sub=int(args.sub)
+sub=int(args.sub)
 # assert sub in [1,2,5,7]
 batch_size=int(args.bs)
 
@@ -68,10 +68,10 @@ class batch_generator_external_images(Dataset):
         return  len(self.im)
 
 
-image_path = 'data/thingseeg2_metadata/train_images.npy'
+image_path = f'data/nsd_metadata/train_images_sub-{sub:02d}.npy'
 train_images = batch_generator_external_images(data_path = image_path)
 
-image_path = 'data/thingseeg2_metadata/test_images.npy'
+image_path = 'data/nsd_metadata/test_images.npy'
 test_images = batch_generator_external_images(data_path = image_path)
 
 trainloader = DataLoader(train_images,batch_size,shuffle=False)
@@ -109,8 +109,7 @@ for i,x in tqdm(enumerate(trainloader), total=len(trainloader), desc='Extracting
         train_latents.append(np.hstack(batch_latent))
 train_latents = np.concatenate(train_latents)      
 
-if not os.path.exists('cache/thingseeg2_extracted_embeddings'):
-    os.makedirs('cache/thingseeg2_extracted_embeddings')
-np.save('cache/thingseeg2_extracted_embeddings/train_autokl.npy', train_latents)
-np.save('cache/thingseeg2_extracted_embeddings/test_autokl.npy', test_latents)
+os.makedirs(f'cache/nsd_extracted_embeddings', exist_ok=True)
+np.save(f'cache/nsd_extracted_embeddings/train_vdvae_sub-{sub:02d}.npy', train_latents)
+np.save('cache/nsd_extracted_embeddings/test_vdvae.npy', test_latents)
 
