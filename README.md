@@ -296,7 +296,7 @@ for sub in 1 2 5 7; do python scripts-nsd_figures/make_vdvae-texture_patterns_fu
 ```
 4. Plot patterns in MNI space
 + For CLIP patterns:\
-<img src="results/nsd_preproc/avg-1-2-5-7/clip_patterns/mni/animals_pattern.png" width="200"><img src="results/nsd_preproc/avg-1-2-5-7/clip_patterns/mni/food_pattern.png" width="200">
+<img src="results/nsd_preproc/avg-1-2-5-7/clip_patterns/mni/animals_pattern.png" width="250"><img src="results/nsd_preproc/avg-1-2-5-7/clip_patterns/mni/food_pattern.png" width="250">
 
 ```
 for sub in 1 2 5 7; do python scripts-nsd_figures/to_mni.py -sub $sub; done
@@ -304,21 +304,21 @@ for sub in 1 2 5 7; do python scripts-nsd_figures/plot_clip_patterns_mni.py -sub
 python scripts-nsd_figures/plot_clip_patterns_mni_avg.py
 ```
 + For PCA-brightness patterns:\
-<img src="results/nsd_preproc/avg-1-2-5-7/pca-brightness_patterns/mni/bright_pattern.png" width="200"><img src="results/nsd_preproc/avg-1-2-5-7/pca-brightness_patterns/mni/dark_pattern.png" width="200">
+<img src="results/nsd_preproc/avg-1-2-5-7/pca-brightness_patterns/mni/bright_pattern.png" width="250"><img src="results/nsd_preproc/avg-1-2-5-7/pca-brightness_patterns/mni/dark_pattern.png" width="250">
 ```
 for sub in 1 2 5 7; do python scripts-nsd_figures/to_mni.py -sub $sub -pattern pca-brightness; done
 for sub in 1 2 5 7; do python scripts-nsd_figures/plot_pca-brightness_patterns_mni.py -sub $sub; done
 python scripts-nsd_figures/plot_pca-brightness_patterns_mni_avg.py
 ```
 + For ICA-color patterns:\
-<img src="results/nsd_preproc/avg-1-2-5-7/ica-color_patterns/mni/blue_pattern.png" width="200"><img src="results/nsd_preproc/avg-1-2-5-7/ica-color_patterns/mni/red_pattern.png" width="200">
+<img src="results/nsd_preproc/avg-1-2-5-7/ica-color_patterns/mni/blue_pattern.png" width="250"><img src="results/nsd_preproc/avg-1-2-5-7/ica-color_patterns/mni/green_pattern.png" width="250"><img src="results/nsd_preproc/avg-1-2-5-7/ica-color_patterns/mni/red_pattern.png" width="250">
 ```
 for sub in 1 2 5 7; do python scripts-nsd_figures/to_mni.py -sub $sub -pattern ica-color; done
 for sub in 1 2 5 7; do python scripts-nsd_figures/plot_ica-color_patterns_mni.py -sub $sub; done
 python scripts-nsd_figures/plot_ica-color_patterns_mni_avg.py
 ```
 + For VDVAE-texture patterns:\
-<img src="results/nsd_preproc/avg-1-2-5-7/vdvae-texture_patterns/mni/smooth_pattern.png" width="200"><img src="results/nsd_preproc/avg-1-2-5-7/vdvae-texture_patterns/mni/textured_pattern.png" width="200">
+<img src="results/nsd_preproc/avg-1-2-5-7/vdvae-texture_patterns/mni/smooth_pattern.png" width="250"><img src="results/nsd_preproc/avg-1-2-5-7/vdvae-texture_patterns/mni/textured_pattern.png" width="250">
 ```
 for sub in 1 2 5 7; do python scripts-nsd_figures/to_mni.py -sub $sub -pattern vdvae-texture; done
 for sub in 1 2 5 7; do python scripts-nsd_figures/plot_vdvae-texture_patterns_mni.py -sub $sub; done
