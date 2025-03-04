@@ -102,6 +102,28 @@ python scripts-thingseeg2/evaluate_reconstruction.py
 python scripts-thingseeg2/plot_reconstructions.py -ordered True
 ```
 
+### PCA and ICA reconstructions
+1. Download ImageNet64 dataset
++ For mac and linux:
+```
+mkdir data/imagenet64/
+wget -O data/imagenet64/imagenet64_train_part1_npz.zip https://image-net.org/data/downsample/Imagenet64_train_part1_npz.zip
+wget -O data/imagenet64/imagenet64_train_part2_npz.zip https://image-net.org/data/downsample/Imagenet64_train_part2_npz.zip
+wget -O data/imagenet64/imagenet64_val_npz.zip https://image-net.org/data/downsample/Imagenet64_val_npz.zip
+unzip data/imagenet64/imagenet64_train_part1_npz.zip -d data/imagenet64/
+for i in {1..5}; do mv data/imagenet64/Imagenet64_train_part1_npz/train_data_batch_$i.npz data/imagenet64/train_data_batch_$i.npz; done
+rm -r data/imagenet64/Imagenet64_train_part1_npz/
+unzip data/imagenet64/imagenet64_train_part2_npz.zip -d data/imagenet64/
+for i in {6..10}; do mv data/imagenet64/Imagenet64_train_part2_npz/train_data_batch_$i.npz data/imagenet64/train_data_batch_$i.npz; done
+rm -r data/imagenet64/Imagenet64_train_part2_npz/
+unzip data/imagenet64/imagenet64_val_npz.zip -d data/imagenet64/
+mv data/imagenet64/Imagenet64_val_npz/val_data.npz data/imagenet64/val_data.npz
+rm -r data/imagenet64/Imagenet64_val_npz/
+rm data/imagenet64/imagenet64_train_part1_npz.zip
+rm data/imagenet64/imagenet64_train_part2_npz.zip
+rm data/imagenet64/imagenet64_val_npz.zip
+```
+
 ## THINGS-EEG2 — Versatile Diffusion Pipeline:
 
 ### Setup
@@ -228,6 +250,14 @@ python scripts-nsd_dataprep/extract_features-vae.py
 python scripts-nsd_dataprep/evaluation_extract_features_from_test_images.py
 ```
 
+4. Extract train and test PCA, ICA, and VDVAE latent embeddings from images
+
+```
+for sub in 1 2 5 7; do python scripts-nsd_dataprep/extract_features-pca.py -sub $sub; done
+for sub in 1 2 5 7; do python scripts-nsd_dataprep/extract_features-ica.py -sub $sub; done
+for sub in 1 2 5 7; do python scripts-nsd_dataprep/extract_features-vdvae.py -sub $sub; done
+```
+
 ### Training and reconstruction
 ```
 python scripts-nsd/train_regression_clip.py 
@@ -250,12 +280,49 @@ for sub in 1 2 5 7; do python scripts-nsd/train_regression_clip.py  -sub $sub; d
 for sub in 1 2 5 7; do python scripts-nsd/train_regression-encode_clip.py  -sub $sub; done
 for sub in 1 2 5 7; do python scripts-nsd_figures/freesurfer_import_subj.py -sub $sub; done
 for sub in 1 2 5 7; do python scripts-nsd_figures/make_clip_patterns_func1pt8mm.py -sub $sub; done
+
+for sub in 1 2 5 7; do python scripts-nsd/train_regression_pca.py  -sub $sub; done
+for sub in 1 2 5 7; do python scripts-nsd/train_regression-encode_pca.py  -sub $sub; done
+for sub in 1 2 5 7; do python scripts-nsd_figures/make_pca-brightness_patterns_func1pt8mm.py -sub $sub; done
+
+for sub in 1 2 5 7; do python scripts-nsd/train_regression_ica.py  -sub $sub; done
+for sub in 1 2 5 7; do python scripts-nsd/train_regression-encode_ica.py  -sub $sub; done
+for sub in 1 2 5 7; do python scripts-nsd_figures/make_ica-color_patterns_func1pt8mm.py -sub $sub; done
+
+for sub in 1 2 5 7; do python scripts-nsd/train_regression_vdvae.py  -sub $sub; done
+for sub in 1 2 5 7; do python scripts-nsd/reconstruct_from_embeddings_vdvae.py   -sub $sub; done
+for sub in 1 2 5 7; do python scripts-nsd/train_regression-encode_vdvae.py  -sub $sub; done
+for sub in 1 2 5 7; do python scripts-nsd_figures/make_vdvae-texture_patterns_func1pt8mm.py -sub $sub; done
 ```
 4. Plot patterns in MNI space
++ For CLIP patterns:\
+<img src="results/nsd_preproc/avg-1-2-5-7/clip_patterns/mni/animals_pattern.png" width="200"><img src="results/nsd_preproc/avg-1-2-5-7/clip_patterns/mni/food_pattern.png" width="200">
+
 ```
 for sub in 1 2 5 7; do python scripts-nsd_figures/to_mni.py -sub $sub; done
 for sub in 1 2 5 7; do python scripts-nsd_figures/plot_clip_patterns_mni.py -sub $sub; done
 python scripts-nsd_figures/plot_clip_patterns_mni_avg.py
+```
++ For PCA-brightness patterns:\
+<img src="results/nsd_preproc/avg-1-2-5-7/pca-brightness_patterns/mni/bright_pattern.png" width="200"><img src="results/nsd_preproc/avg-1-2-5-7/pca-brightness_patterns/mni/dark_pattern.png" width="200">
+```
+for sub in 1 2 5 7; do python scripts-nsd_figures/to_mni.py -sub $sub -pattern pca-brightness; done
+for sub in 1 2 5 7; do python scripts-nsd_figures/plot_pca-brightness_patterns_mni.py -sub $sub; done
+python scripts-nsd_figures/plot_pca-brightness_patterns_mni_avg.py
+```
++ For ICA-color patterns:\
+<img src="results/nsd_preproc/avg-1-2-5-7/ica-color_patterns/mni/blue_pattern.png" width="200"><img src="results/nsd_preproc/avg-1-2-5-7/ica-color_patterns/mni/red_pattern.png" width="200">
+```
+for sub in 1 2 5 7; do python scripts-nsd_figures/to_mni.py -sub $sub -pattern ica-color; done
+for sub in 1 2 5 7; do python scripts-nsd_figures/plot_ica-color_patterns_mni.py -sub $sub; done
+python scripts-nsd_figures/plot_ica-color_patterns_mni_avg.py
+```
++ For VDVAE-texture patterns:\
+<img src="results/nsd_preproc/avg-1-2-5-7/vdvae-texture_patterns/mni/smooth_pattern.png" width="200"><img src="results/nsd_preproc/avg-1-2-5-7/vdvae-texture_patterns/mni/textured_pattern.png" width="200">
+```
+for sub in 1 2 5 7; do python scripts-nsd_figures/to_mni.py -sub $sub -pattern vdvae-texture; done
+for sub in 1 2 5 7; do python scripts-nsd_figures/plot_vdvae-texture_patterns_mni.py -sub $sub; done
+python scripts-nsd_figures/plot_vdvae-texture_patterns_mni_avg.py
 ```
 
 ## Acknowledgement

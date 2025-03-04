@@ -1,5 +1,5 @@
 import io
-import IPython.display
+# import IPython.display
 import PIL.Image
 import os
 from pprint import pformat
@@ -42,22 +42,22 @@ def interleave(*args):
   out = out.reshape(-1, *a0.shape[1:])
   return out
 
-def imshow(a, format='png', jpeg_fallback=True):
-  """Displays an image in the given format."""
-  a = a.astype(np.uint8)
-  data = io.BytesIO()
-  PIL.Image.fromarray(a).save(data, format)
-  im_data = data.getvalue()
-  try:
-    disp = IPython.display.display(IPython.display.Image(im_data))
-  except IOError:
-    if jpeg_fallback and format != 'jpeg':
-      print ('Warning: image was too large to display in format "{}"; '
-             'trying jpeg instead.').format(format)
-      return imshow(a, format='jpeg')
-    else:
-      raise
-  return disp
+# def imshow(a, format='png', jpeg_fallback=True):
+#   """Displays an image in the given format."""
+#   a = a.astype(np.uint8)
+#   data = io.BytesIO()
+#   PIL.Image.fromarray(a).save(data, format)
+#   im_data = data.getvalue()
+#   try:
+#     disp = IPython.display.display(IPython.display.Image(im_data))
+#   except IOError:
+#     if jpeg_fallback and format != 'jpeg':
+#       print ('Warning: image was too large to display in format "{}"; '
+#              'trying jpeg instead.').format(format)
+#       return imshow(a, format='jpeg')
+#     else:
+#       raise
+#   return disp
 
 def image_to_uint8(x):
   """Converts [-1, 1] float array to [0, 255] uint8."""

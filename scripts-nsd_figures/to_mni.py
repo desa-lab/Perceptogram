@@ -14,12 +14,14 @@ parser.add_argument("-sub", "--sub",help="Subject Number",default=1)
 parser.add_argument('-pattern', '--pattern-type', help='Pattern Type', default='clip')
 args = parser.parse_args()
 sub = int(args.sub)
+pattern_type = args.pattern_type
+assert pattern_type in ['clip', 'pca-brightness', 'ica-color', 'vdvae-texture']
 
 base_path = os.path.join('data/nsd_preproc')
 nsd = NSDmapdata(base_path)
 sourcespace = 'func1pt8'
-sourcefolder = f'cache/nsd_preproc/predicted_patterns/clip_patterns/sub-{sub:02d}/func1pt8mm/'
-outputfolder = f'cache/nsd_preproc/predicted_patterns/clip_patterns/sub-{sub:02d}/mni/'
+sourcefolder = f'cache/nsd_preproc/predicted_patterns/{pattern_type}_patterns/sub-{sub:02d}/func1pt8mm/'
+outputfolder = f'cache/nsd_preproc/predicted_patterns/{pattern_type}_patterns/sub-{sub:02d}/mni/'
 
 os.makedirs(outputfolder, exist_ok=True)
 for filename in os.listdir(sourcefolder):
