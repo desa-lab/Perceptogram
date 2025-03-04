@@ -1,8 +1,12 @@
 # Perceptogram
 Link to paper: [Perceptogram: Reconstructing Visual Percepts from EEG](https://arxiv.org/abs/2404.01250)
-+ Overview:\
+
++ Overview:
+
 <img src="figures/overview.png" width="350">
-+ EEG patterns show spatial alignment with fMRI patterns:\
+
++ EEG patterns show spatial alignment with fMRI patterns:
+
 <img src="figures/three_patterns_abc.png" width="700">
 
 ## THINGS-EEG2 — unCLIP Pipeline:
