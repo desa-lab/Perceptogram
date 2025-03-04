@@ -3,7 +3,7 @@ Link to paper: [Perceptogram: Reconstructing Visual Percepts from EEG](https://a
 
 + Overview:
 
-<img src="figures/overview.png" width="400">
+<img src="figures/overview.png" width="400"><img src="figures/best_middle_worst.png" width="400">
 
 + EEG patterns show spatial alignment with fMRI patterns:
 
@@ -136,7 +136,6 @@ rm data/imagenet64/imagenet64_val_npz.zip
 
 ## THINGS-EEG2 — Versatile Diffusion Pipeline:
 
-<img src="figures/best_middle_worst.png" width="500">
 
 ### Setup
 
