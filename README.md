@@ -1,17 +1,18 @@
 # Perceptogram
-
+Link to paper: [Perceptogram: Reconstructing Visual Percepts from EEG](https://arxiv.org/abs/2404.01250)
 
 + Overview:
 
-<img src="figures/overview.png" width="400">
+<!-- <img src="figures/overview.png" width="390"><img src="figures/best_middle_worst.png" width="410"> -->
+<img src="figures/overview.png" style="width: 47%;"><img src="figures/best_middle_worst.png" style="width: 53%;">
 
 + EEG patterns show spatial alignment with fMRI patterns:
 
-<img src="figures/three_patterns_abc.png" width="700">
+<img src="figures/three_patterns_abc.png" width="850">
 
 ## THINGS-EEG2 — unCLIP Pipeline:
 
-![unclip_pipeline](figures/unclip_pipeline.png)
+<img src="figures/unclip_pipeline.png" width="850">
 
 ### Setup
 
@@ -112,6 +113,28 @@ python scripts-thingseeg2/evaluate_reconstruction.py
 python scripts-thingseeg2/plot_reconstructions.py -ordered True
 ```
 
+### Reproducing figures
+
+1. Prepare grayscale images for CLIP patterns, and extract latents
+```
+python scripts-thingseeg2_dataprep/grayscale_images.py
+python scripts-thingseeg2_dataprep/extract_features-clip_grayscale.py
+python scripts-thingseeg2_dataprep/extract_features-pca.py
+python scripts-thingseeg2_dataprep/extract_features-ica.py
+```
+
+2. Train the decoding and encoding regressors
+```
+for sub in {1..10}; do python scripts-thingseeg2/train_regression_clip_grayscale.py -sub $sub; done
+for sub in {1..10}; do python scripts-thingseeg2/train_regression-encode_clip_grayscale.py -sub $sub; done
+for sub in {1..10}; do python scripts-thingseeg2/train_regression_pca.py -sub $sub; done
+for sub in {1..10}; do python scripts-thingseeg2/train_regression-encode_pca.py -sub $sub; done
+for sub in {1..10}; do python scripts-thingseeg2/train_regression_ica.py -sub $sub; done
+for sub in {1..10}; do python scripts-thingseeg2/train_regression-encode_ica.py -sub $sub; done
+for sub in {1..10}; do python scripts-thingseeg2/train_regression_vdvae.py -sub $sub; done
+for sub in {1..10}; do python scripts-thingseeg2/train_regression-encode_vdvae.py -sub $sub; done
+```
+
 ### PCA and ICA reconstructions
 1. Download ImageNet64 dataset
 + For mac and linux:
@@ -135,8 +158,6 @@ rm data/imagenet64/imagenet64_val_npz.zip
 ```
 
 ## THINGS-EEG2 — Versatile Diffusion Pipeline:
-
-<img src="figures/best_middle_worst.png" width="500">
 
 ### Setup
 

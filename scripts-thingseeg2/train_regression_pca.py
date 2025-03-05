@@ -18,9 +18,7 @@ parser.add_argument('-mirrored2', '--mirrored2', help='Mirrored electrode locati
 parser.add_argument('-half', '--half', help='Half of the channels using the 10-20 instead of 10-10 montage', default=False, action=argparse.BooleanOptionalAction)
 parser.add_argument('-dsi1', '--dsi1', help='Simulate DSI-24 layout, using P7 and P8', default=False, action=argparse.BooleanOptionalAction)
 parser.add_argument('-dsi2', '--dsi2', help='Simulate DSI-24 layout, not using P7 and P8', default=False, action=argparse.BooleanOptionalAction)
-parser.add_argument('-alpha', '--alpha', help='Alpha for regression strength', default=0)
-parser.add_argument('-param', '--param', help='Custom Parameter', default='')
-
+parser.add_argument('-alpha', '--alpha', help='Alpha for regression strength', default=1000)
 args = parser.parse_args()
 sub=int(args.sub)
 saving_weights=args.saving_weights
@@ -37,9 +35,6 @@ if average != '' or train_size != 16540 or duration != 80:
     param = f'_{train_size}avg{average}_dur{duration}'
 else:
     param = ''
-custom_param=args.param
-if custom_param != '':
-    param += f'_{custom_param}'
 
 # Load EEG data
 if duration != 0:
@@ -82,19 +77,16 @@ eeg_test = (eeg_test - norm_mean_train) / norm_scale_train
 weights_save_dir = f'cache/thingseeg2_preproc/regression_weights/sub-{sub:02d}/'
 if not os.path.exists(weights_save_dir):
     os.makedirs(weights_save_dir)
-vdvae_weights_filename = f'regress_clip_weights{param}.pkl'
+weights_filename = f'regress_pca1k_weights{param}.pkl'
 save_dir = f'cache/thingseeg2_preproc/predicted_embeddings/sub-{sub:02d}/'
 if not os.path.exists(save_dir):
     os.makedirs(save_dir)
-latent_filename = f'regress_clip{param}.npy'
-# latent_filename = f'regress_clip{param}_grayscale.npy'
+latent_filename = f'regress_pca1k{param}.npy'
 
 ids = list(range(len(eeg_train)))
 # Regression
-train_latents= np.load('cache/thingseeg2_extracted_embeddings/train_clip.npy', mmap_mode='r')[ids]
-test_latents = np.load('cache/thingseeg2_extracted_embeddings/test_clip.npy', mmap_mode='r')
-# train_latents= np.load('cache/thingseeg2_extracted_embeddings/train_clip_grayscale.npy', mmap_mode='r')[ids]
-# test_latents = np.load('cache/thingseeg2_extracted_embeddings/test_clip_grayscale.npy', mmap_mode='r')
+train_latents= np.load('cache/thingseeg2_extracted_embeddings/train_pca1k.npy', mmap_mode='r')[ids]
+test_latents = np.load('cache/thingseeg2_extracted_embeddings/test_pca1k.npy', mmap_mode='r')
 print(train_latents.shape, test_latents.shape)
 
 print("Training Regression")
@@ -108,7 +100,7 @@ if saving_weights:
         'bias' : reg.intercept_,
     }
 
-    with open(weights_save_dir + vdvae_weights_filename, "wb") as f:
+    with open(weights_save_dir + weights_filename, "wb") as f:
         pickle.dump(datadict,f)
 
 pred_latent = reg.predict(eeg_test)
@@ -127,6 +119,7 @@ correlation_distances = np.array([correlation(u, v) for u, v in zip(pred_latents
 # Compute the average Euclidean distance
 average_euclidean_distance = euclidean_distances.mean()
 correlations = (1 - correlation_distances).mean()
-print(reg.score(eeg_test,test_latents), average_euclidean_distance, correlations) # 0.034224083998682577 21.1938984051386 0.5412925614798246 when alpha=1000
+print(reg.score(eeg_test,test_latents), average_euclidean_distance, correlations) # -0.0051861027727781745 29.053478692843534 0.8718774386094355 when alpha=1000
+
 
 

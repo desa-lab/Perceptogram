@@ -1,7 +1,5 @@
 import numpy as np
-import scipy
 from scipy.spatial.distance import correlation
-import random
 import sklearn.linear_model as skl
 import os
 import pickle
@@ -13,9 +11,11 @@ parser.add_argument('-weights', '--saving_weights',help="Saving the weights", de
 parser.add_argument('-size', '--size', help='Size', default=16540)
 parser.add_argument('-avg', '--average', help='Number of averages', default='')
 parser.add_argument('-duration', '--duration', help='Duration', default=80)
+parser.add_argument('-alpha', '--alpha', help='Alpha for regression strength', default=1000)
 args = parser.parse_args()
 sub=int(args.sub)
 saving_weights=args.saving_weights
+alpha = int(args.alpha)
 train_size=int(args.size)
 average=args.average
 duration=int(args.duration)
@@ -60,7 +60,7 @@ test_latents = np.load('cache/thingseeg2_extracted_embeddings/test_vdvae.npy', m
 print(train_latents.shape, test_latents.shape)
 
 print("Training VDVAE Regression")
-reg = skl.Ridge(alpha=1000, max_iter=50000, fit_intercept=True)
+reg = skl.Ridge(alpha=alpha, max_iter=50000, fit_intercept=True)
 reg.fit(eeg_train, train_latents)
 print('VDVAE training complete')
 
@@ -91,84 +91,4 @@ average_euclidean_distance = euclidean_distances.mean()
 correlations = (1 - correlation_distances).mean()
 print(reg.score(eeg_test,test_latents), average_euclidean_distance, correlations)
 
-# CLIP-Vision Regression
-train_clip_all = np.load('cache/thingseeg2_extracted_embeddings/train_clipvision.npy', mmap_mode='r')
-test_clip = np.load('cache/thingseeg2_extracted_embeddings/test_clipvision.npy', mmap_mode='r')
-train_clip = train_clip_all[ids]
-print(train_clip.shape, test_clip.shape)
-
-num_features = eeg_train.shape[1]
-num_samples,num_token,num_dim = train_clip.shape
-print("Training Regression")
-reg_w = np.zeros((num_token,num_dim,num_features)).astype(np.float32)
-reg_b = np.zeros((num_token,num_dim)).astype(np.float32)
-pred_clip = np.zeros_like(test_clip)
-for i in range(num_token):
-
-    reg = skl.Ridge(alpha=1000, max_iter=50000, fit_intercept=True)
-    reg.fit(eeg_train, train_clip[:,i])
-    reg_w[i] = reg.coef_
-    reg_b[i] = reg.intercept_
-    
-    pred_test_latent = reg.predict(eeg_test)
-    std_norm_test_latent = (pred_test_latent - np.mean(pred_test_latent,axis=0)) / np.std(pred_test_latent,axis=0)
-    pred_clip[:,i] = std_norm_test_latent * np.std(train_clip_all[:,i],axis=0) + np.mean(train_clip_all[:,i],axis=0)
-
-    # Compute the Euclidean distances
-    euclidean_distances = np.array([np.linalg.norm(u - v) for u, v in zip(pred_clip[:,i], test_clip[:,i])])
-    correlation_distances = np.array([correlation(u, v) for u, v in zip(pred_clip[:,i], test_clip[:,i])])
-    # Compute the average Euclidean distance
-    average_euclidean_distance = euclidean_distances.mean()
-    correlations = (1 - correlation_distances).mean()
-    
-    print(i,reg.score(eeg_test,test_clip[:,i]), average_euclidean_distance, correlations)
-
-if saving_weights:
-    datadict = {
-        'weight' : reg_w,
-        'bias' : reg_b,
-    }
-    with open(weights_save_dir + clipvision_weights_filename, "wb") as f:
-        pickle.dump(datadict,f)
-np.save(save_dir + clipvision_filename, pred_clip)
-
-# CLIP-Text Regression
-train_clip_all = np.load('cache/thingseeg2_extracted_embeddings/train_cliptext.npy', mmap_mode='r')
-test_clip = np.load('cache/thingseeg2_extracted_embeddings/test_cliptext.npy', mmap_mode='r')
-train_clip = train_clip_all[ids]
-
-num_features = eeg_train.shape[1]
-num_samples,num_token,num_dim = train_clip.shape
-
-print("Training Regression")
-reg_w = np.zeros((num_token,num_dim,num_features)).astype(np.float32)
-reg_b = np.zeros((num_token,num_dim)).astype(np.float32)
-pred_clip = np.zeros_like(test_clip)
-for i in range(num_token):
-    reg = skl.Ridge(alpha=10000, max_iter=50000, fit_intercept=True)
-    reg.fit(eeg_train, train_clip[:,i])
-
-    reg_w[i] = reg.coef_
-    reg_b[i] = reg.intercept_
-    
-    pred_test_latent = reg.predict(eeg_test)
-    std_norm_test_latent = (pred_test_latent - np.mean(pred_test_latent,axis=0)) / np.std(pred_test_latent,axis=0)
-    pred_clip[:,i] = std_norm_test_latent * np.std(train_clip_all[:,i],axis=0) + np.mean(train_clip_all[:,i],axis=0)
-
-    # Compute the Euclidean distances
-    euclidean_distances = np.array([np.linalg.norm(u - v) for u, v in zip(pred_clip[:,i], test_clip[:,i])])
-    correlation_distances = np.array([correlation(u, v) for u, v in zip(pred_clip[:,i], test_clip[:,i])])
-    # Compute the average Euclidean distance
-    average_euclidean_distance = euclidean_distances.mean()
-    correlations = (1 - correlation_distances).mean()
-
-    print(i,reg.score(eeg_test,test_clip[:,i]), average_euclidean_distance, correlations)
-
-if saving_weights:
-    datadict = {
-        'weight' : reg_w,
-        'bias' : reg_b,
-    }
-    with open(weights_save_dir + cliptext_weights_filename, "wb") as f:
-        pickle.dump(datadict,f)
-np.save(save_dir + cliptext_filename, pred_clip)
+# -0.00804050828001167 113.49984219322715 0.022645192397006547 when alpha=1000

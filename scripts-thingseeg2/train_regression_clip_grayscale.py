@@ -82,19 +82,20 @@ eeg_test = (eeg_test - norm_mean_train) / norm_scale_train
 weights_save_dir = f'cache/thingseeg2_preproc/regression_weights/sub-{sub:02d}/'
 if not os.path.exists(weights_save_dir):
     os.makedirs(weights_save_dir)
-vdvae_weights_filename = f'regress_clip_weights{param}.pkl'
+# vdvae_weights_filename = f'regress_clip_weights{param}.pkl'
+vdvae_weights_filename = f'regress_clip_weights{param}_grayscale.pkl'
 save_dir = f'cache/thingseeg2_preproc/predicted_embeddings/sub-{sub:02d}/'
 if not os.path.exists(save_dir):
     os.makedirs(save_dir)
-latent_filename = f'regress_clip{param}.npy'
-# latent_filename = f'regress_clip{param}_grayscale.npy'
+# latent_filename = f'regress_clip{param}.npy'
+latent_filename = f'regress_clip{param}_grayscale.npy'
 
 ids = list(range(len(eeg_train)))
 # Regression
-train_latents= np.load('cache/thingseeg2_extracted_embeddings/train_clip.npy', mmap_mode='r')[ids]
-test_latents = np.load('cache/thingseeg2_extracted_embeddings/test_clip.npy', mmap_mode='r')
-# train_latents= np.load('cache/thingseeg2_extracted_embeddings/train_clip_grayscale.npy', mmap_mode='r')[ids]
-# test_latents = np.load('cache/thingseeg2_extracted_embeddings/test_clip_grayscale.npy', mmap_mode='r')
+# train_latents= np.load('cache/thingseeg2_extracted_embeddings/train_clip.npy', mmap_mode='r')[ids]
+# test_latents = np.load('cache/thingseeg2_extracted_embeddings/test_clip.npy', mmap_mode='r')
+train_latents= np.load('cache/thingseeg2_extracted_embeddings/train_clip_grayscale.npy', mmap_mode='r')[ids]
+test_latents = np.load('cache/thingseeg2_extracted_embeddings/test_clip_grayscale.npy', mmap_mode='r')
 print(train_latents.shape, test_latents.shape)
 
 print("Training Regression")
@@ -127,6 +128,6 @@ correlation_distances = np.array([correlation(u, v) for u, v in zip(pred_latents
 # Compute the average Euclidean distance
 average_euclidean_distance = euclidean_distances.mean()
 correlations = (1 - correlation_distances).mean()
-print(reg.score(eeg_test,test_latents), average_euclidean_distance, correlations) # 0.034224083998682577 21.1938984051386 0.5412925614798246 when alpha=1000
+print(reg.score(eeg_test,test_latents), average_euclidean_distance, correlations) # 0.039611115187998855 20.682264745990615 0.5521438011725773 when alpha=0
 
 
