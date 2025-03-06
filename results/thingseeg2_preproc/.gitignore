@@ -7,3 +7,10 @@
 !fig_ablations.png
 !fig_across_duration.png
 !fig_CLIP_across_size_num_avg.png
+!three_patterns_negative_avg_180ms.png
+!blue_pattern_negative_avg_120ms.png
+!red_pattern_negative_avg_120ms.png
+!smooth_pattern_negative_avg_120ms.png
+!textured_pattern_negative_avg_120ms.png
+!pca-bright_patterns_avg_120-220ms.png
+!pca-dark_patterns_avg_120-220ms.png

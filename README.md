@@ -113,6 +113,41 @@ python scripts-thingseeg2/evaluate_reconstruction.py
 python scripts-thingseeg2/plot_reconstructions.py -ordered True
 ```
 
+### PCA and ICA reconstructions
+1. Download ImageNet64 dataset
++ For mac and linux:
+```
+mkdir data/imagenet64/
+wget -O data/imagenet64/imagenet64_train_part1_npz.zip https://image-net.org/data/downsample/Imagenet64_train_part1_npz.zip
+wget -O data/imagenet64/imagenet64_train_part2_npz.zip https://image-net.org/data/downsample/Imagenet64_train_part2_npz.zip
+wget -O data/imagenet64/imagenet64_val_npz.zip https://image-net.org/data/downsample/Imagenet64_val_npz.zip
+unzip data/imagenet64/imagenet64_train_part1_npz.zip -d data/imagenet64/
+for i in {1..5}; do mv data/imagenet64/Imagenet64_train_part1_npz/train_data_batch_$i.npz data/imagenet64/train_data_batch_$i.npz; done
+rm -r data/imagenet64/Imagenet64_train_part1_npz/
+unzip data/imagenet64/imagenet64_train_part2_npz.zip -d data/imagenet64/
+for i in {6..10}; do mv data/imagenet64/Imagenet64_train_part2_npz/train_data_batch_$i.npz data/imagenet64/train_data_batch_$i.npz; done
+rm -r data/imagenet64/Imagenet64_train_part2_npz/
+unzip data/imagenet64/imagenet64_val_npz.zip -d data/imagenet64/
+mv data/imagenet64/Imagenet64_val_npz/val_data.npz data/imagenet64/val_data.npz
+rm -r data/imagenet64/Imagenet64_val_npz/
+rm data/imagenet64/imagenet64_train_part1_npz.zip
+rm data/imagenet64/imagenet64_train_part2_npz.zip
+rm data/imagenet64/imagenet64_val_npz.zip
+```
+
+2. Fit PCA selfvectors and ICA encoder and decoder on ImageNet64:
+```
+python scripts-thingseeg2_dataprep/pca.py
+python scripts-thingseeg2_dataprep/ica.py
+```
+
+3. Training the regressors for the PCA and ICA latent spaces, and reconstruct
+```
+python scripts-thingseeg2/train_regression_pca.py
+python scripts-thingseeg2/train_regression_ica.py
+python scripts-thingseeg2/reconstruct_from_embeddings_pca.py
+```
+
 ### Reproducing figures
 
 1. Prepare grayscale images for CLIP patterns, and extract latents
@@ -135,26 +170,49 @@ for sub in {1..10}; do python scripts-thingseeg2/train_regression_vdvae.py -sub 
 for sub in {1..10}; do python scripts-thingseeg2/train_regression-encode_vdvae.py -sub $sub; done
 ```
 
-### PCA and ICA reconstructions
-1. Download ImageNet64 dataset
-+ For mac and linux:
+3. Reconstruct the images so we can group the patterns based on the reconstructions
 ```
-mkdir data/imagenet64/
-wget -O data/imagenet64/imagenet64_train_part1_npz.zip https://image-net.org/data/downsample/Imagenet64_train_part1_npz.zip
-wget -O data/imagenet64/imagenet64_train_part2_npz.zip https://image-net.org/data/downsample/Imagenet64_train_part2_npz.zip
-wget -O data/imagenet64/imagenet64_val_npz.zip https://image-net.org/data/downsample/Imagenet64_val_npz.zip
-unzip data/imagenet64/imagenet64_train_part1_npz.zip -d data/imagenet64/
-for i in {1..5}; do mv data/imagenet64/Imagenet64_train_part1_npz/train_data_batch_$i.npz data/imagenet64/train_data_batch_$i.npz; done
-rm -r data/imagenet64/Imagenet64_train_part1_npz/
-unzip data/imagenet64/imagenet64_train_part2_npz.zip -d data/imagenet64/
-for i in {6..10}; do mv data/imagenet64/Imagenet64_train_part2_npz/train_data_batch_$i.npz data/imagenet64/train_data_batch_$i.npz; done
-rm -r data/imagenet64/Imagenet64_train_part2_npz/
-unzip data/imagenet64/imagenet64_val_npz.zip -d data/imagenet64/
-mv data/imagenet64/Imagenet64_val_npz/val_data.npz data/imagenet64/val_data.npz
-rm -r data/imagenet64/Imagenet64_val_npz/
-rm data/imagenet64/imagenet64_train_part1_npz.zip
-rm data/imagenet64/imagenet64_train_part2_npz.zip
-rm data/imagenet64/imagenet64_val_npz.zip
+for sub in {1..10}; do python scripts-thingseeg2/reconstruct_from_embeddings_pca.py -sub $sub; done
+for sub in {1..10}; do python scripts-thingseeg2/reconstruct_from_embeddings_ica.py -sub $sub; done
+for sub in {1..10}; do python scripts-thingseeg2/reconstruct_from_embeddings_vdvae.py -sub $sub; done
+```
+
+4. Plot patterns
+
++ For CLIP patterns:
+
+<img src="results/thingseeg2_preproc/three_patterns_negative_avg_180ms.png" width="250">
+
+```
+python scripts-thingseeg2_figures/plot_clip_patterns_negative.py
+python scripts-thingseeg2_figures/plot_clip_patterns_negative_avg.py
+```
+
++ For ICA-color patterns:
+
+<img src="results/thingseeg2_preproc/blue_pattern_negative_avg_120ms.png" width="250"><img src="results/thingseeg2_preproc/red_pattern_negative_avg_120ms.png" width="250">
+
+```
+python scripts-thingseeg2_figures/plot_ica-color_patterns_negative.py
+python scripts-thingseeg2_figures/plot_ica-color_patterns_negative_avg.py
+```
+
++ For VDVAE-texture patterns:
+
+<img src="results/thingseeg2_preproc/smooth_pattern_negative_avg_120ms.png" width="250"><img src="results/thingseeg2_preproc/textured_pattern_negative_avg_120ms.png" width="250">
+
+```
+python scripts-thingseeg2_figures/plot_vdvae-texture_patterns_negative.py
+python scripts-thingseeg2_figures/plot_vdvae-texture_patterns_negative_avg.py
+```
+
++ For PCA-brightness patterns:
+
+<img src="results/thingseeg2_preproc/pca-bright_patterns_avg_120-220ms.png" width="230"><img src="results/thingseeg2_preproc/pca-dark_patterns_avg_120-220ms.png" width="230">
+
+```
+python scripts-thingseeg2_figures/plot_pca-brightness_patterns.py
+python scripts-thingseeg2_figures/plot_pca-brightness_patterns_avg.py
 ```
 
 ## THINGS-EEG2 — Versatile Diffusion Pipeline:

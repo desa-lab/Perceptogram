@@ -2,6 +2,7 @@
 *
 # Except this file
 !.gitignore
+!thingseeg2_preproc/
 !thingseeg2_preproc/sub-01/
 !thingseeg2_preproc/fig_performance.png
 !thingseeg2_preproc/fig_ablations.png
