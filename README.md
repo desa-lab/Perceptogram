@@ -1,5 +1,4 @@
 # Perceptogram
-Link to paper: [Perceptogram: Reconstructing Visual Percepts from EEG](https://arxiv.org/abs/2404.01250)
 
 + Overview:
 
