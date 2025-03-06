@@ -179,26 +179,37 @@ for sub in {1..10}; do python scripts-thingseeg2/reconstruct_from_embeddings_vdv
 
 4. Plot patterns
 
-+ For CLIP patterns:\
++ For CLIP patterns:
+
 <img src="results/thingseeg2_preproc/three_patterns_negative_avg_180ms.png" width="250">
+
 ```
 python scripts-thingseeg2_figures/plot_clip_patterns_negative.py
 python scripts-thingseeg2_figures/plot_clip_patterns_negative_avg.py
 ```
-+ For ICA-color patterns:\
+
++ For ICA-color patterns:
+
 <img src="results/thingseeg2_preproc/blue_pattern_negative_avg_120ms.png" width="250"><img src="results/thingseeg2_preproc/red_pattern_negative_avg_120ms.png" width="250">
+
 ```
 python scripts-thingseeg2_figures/plot_ica-color_patterns_negative.py
 python scripts-thingseeg2_figures/plot_ica-color_patterns_negative_avg.py
 ```
-+ For VDVAE-texture patterns:\
+
++ For VDVAE-texture patterns:
+
 <img src="results/thingseeg2_preproc/smooth_pattern_negative_avg_120ms.png" width="250"><img src="results/thingseeg2_preproc/textured_pattern_negative_avg_120ms.png" width="250">
+
 ```
 python scripts-thingseeg2_figures/plot_vdvae-texture_patterns_negative.py
 python scripts-thingseeg2_figures/plot_vdvae-texture_patterns_negative_avg.py
 ```
-+ For PCA-brightness patterns:\
+
++ For PCA-brightness patterns:
+
 <img src="results/thingseeg2_preproc/pca-bright_patterns_avg_120-220ms.png" width="230"><img src="results/thingseeg2_preproc/pca-dark_patterns_avg_120-220ms.png" width="230">
+
 ```
 python scripts-thingseeg2_figures/plot_pca-brightness_patterns.py
 python scripts-thingseeg2_figures/plot_pca-brightness_patterns_avg.py
