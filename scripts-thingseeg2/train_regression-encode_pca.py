@@ -16,7 +16,7 @@ parser.add_argument('-mirrored2', '--mirrored2', help='Mirrored electrode locati
 parser.add_argument('-half', '--half', help='Half of the channels using the 10-20 instead of 10-10 montage', default=False, action=argparse.BooleanOptionalAction)
 parser.add_argument('-dsi1', '--dsi1', help='Simulate DSI-24 layout, using P7 and P8', default=False, action=argparse.BooleanOptionalAction)
 parser.add_argument('-dsi2', '--dsi2', help='Simulate DSI-24 layout, not using P7 and P8', default=False, action=argparse.BooleanOptionalAction)
-parser.add_argument('-alpha', '--alpha', help='Alpha for regression strength', default=1000)
+parser.add_argument('-alpha', '--alpha', help='Alpha for regression strength', default=1000000)
 parser.add_argument('-param', '--param', help='Custom Parameter', default='')
 
 args = parser.parse_args()
@@ -125,3 +125,4 @@ correlations = (1 - correlation_distances).mean()
 print(reg.score(test_latents, eeg_test), average_euclidean_distance, correlations)
 
 # -1.127087542962558 13.584328628556937 0.054864638828813386 for alpha=1000
+# -0.1843546923019768 10.944589338738044 0.06040139901465705 for alpha=1000000

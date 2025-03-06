@@ -16,7 +16,7 @@ parser.add_argument('-mirrored2', '--mirrored2', help='Mirrored electrode locati
 parser.add_argument('-half', '--half', help='Half of the channels using the 10-20 instead of 10-10 montage', default=False, action=argparse.BooleanOptionalAction)
 parser.add_argument('-dsi1', '--dsi1', help='Simulate DSI-24 layout, using P7 and P8', default=False, action=argparse.BooleanOptionalAction)
 parser.add_argument('-dsi2', '--dsi2', help='Simulate DSI-24 layout, not using P7 and P8', default=False, action=argparse.BooleanOptionalAction)
-parser.add_argument('-alpha', '--alpha', help='Alpha for regression strength', default=1000)
+parser.add_argument('-alpha', '--alpha', help='Alpha for regression strength', default=1000000)
 parser.add_argument('-param', '--param', help='Custom Parameter', default='')
 
 args = parser.parse_args()
