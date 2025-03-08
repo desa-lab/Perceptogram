@@ -23,7 +23,7 @@ Link to paper: [Perceptogram: Reconstructing Visual Percepts from EEG](https://a
 virtualenv pyenv --python=3.10.12
 source pyenv/bin/activate
 pip install -r requirements.txt
-mv scripts-thingseeg2_dataprep/pipeline_stable_unclip_img2img_modified.py pyenv/lib/python3.10/site-packages/diffusers/pipelines/stable_diffusion/pipeline_stable_unclip_img2img.py
+cp scripts-thingseeg2_dataprep/pipeline_stable_unclip_img2img_modified.py pyenv/lib/python3.10/site-packages/diffusers/pipelines/stable_diffusion/pipeline_stable_unclip_img2img.py
 ```
 + For Windows:
 ```
